@@ -1,3 +1,5 @@
+
+
 close all; clear all; clc;
 
 %%---- Configurazione iniziale manipolatore ---%%
@@ -6,7 +8,7 @@ I = eye(4,4);
 %% PUNTO INIZIALE
 theta1_deg = 90; 
 theta2_deg = 90;
-theta3_deg = -90;
+theta3_deg = -90; 
 theta1_rad = deg2rad(theta1_deg);
 theta2_rad = deg2rad(theta2_deg);
 theta3_rad = deg2rad(theta3_deg);
@@ -38,8 +40,8 @@ Jinv = pinv(J);
 x_pos2 = [A40(1,4),A40(2,4)];
 
 errori=[];
-for t = ti : delta_t : tf
 
+for t = ti : delta_t : tf
 Pe = x_pos1 + ((-2*(t^3) +15*(t^2))/125)*(x_pos2-x_pos1);
 Pe_der = (-(6/125)*(t^2) + (6/25)*t) * (x_pos2-x_pos1);
 errore = Pe - x_pos
@@ -64,7 +66,7 @@ t1 = atan2(V(2,2),V(1,2));
 xe = sqrt(max(abs(ev)));
 ye = sqrt(min(abs(ev)));
 aa = [cos(t1), -sin(t1); sin(t1), cos(t1)]* [xe*cosd(0:360)/ xe; ye*sind(0:360)/xe];
-%%plot(x_pos(1)+aa(1,:), x_pos(2)+aa(2,:),'b-');
+plot(x_pos(1)+aa(1,:), x_pos(2)+aa(2,:),'b-');
 
 
 hold off
