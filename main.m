@@ -1,5 +1,5 @@
-
-
+current_path = genpath(pwd);
+addpath(current_path);
 close all; clear all; clc;
 
 %%---- Configurazione iniziale manipolatore ---%%
@@ -25,32 +25,38 @@ q2=[theta1_rad,theta2_rad,theta3_rad];
 
 %% CONFIGURAZIONE TRAIETTORIA
 ti = 0;
-tf=5;
+tf = 5;
 delta_t = 0.4;
 k = [1,0;
-    0,1];
+   0, 1;];
 
 [A10, A20,A30,A40] = CinematicaDiretta(a,q);
 x_pos1 = [A40(1,4),A40(2,4)];
 x_pos = x_pos1;
 [J] = JacobianoGeometrico(a,q,A10,A20,A30);
+J = J([1:2],:);
 Jinv = pinv(J);
 
 [A10, A20,A30,A40] = CinematicaDiretta(a,q2);
 x_pos2 = [A40(1,4),A40(2,4)];
-
 errori=[];
 
+
 for t = ti : delta_t : tf
-Pe = x_pos1 + ((-2*(t^3) +15*(t^2))/125)*(x_pos2-x_pos1);
-Pe_der = (-(6/125)*(t^2) + (6/25)*t) * (x_pos2-x_pos1);
+Pe = x_pos1 + ((-3*(x_pos1-x_pos2))/25)*t^2  + ((2*(x_pos1-x_pos2))/125)*t^3 ;
+Pe_der = ((6/125)*(t^2) - (6/25)*t) * (x_pos1-x_pos2);
+Pe
+x_pos
 errore = Pe - x_pos
 errori = [errori;errore];
-q_der = Jinv *( (Pe_der') + k*errore');
+q_der = Jinv *( (Pe_der') + (k*errore'));
 q = q + (q_der * delta_t)';
+q
+q2
 [A10, A20,A30,A40] = CinematicaDiretta(a,q);
 x_pos = [A40(1,4),A40(2,4)];
 [J] = JacobianoGeometrico(a,q,A10,A20,A30);
+J = J([1:2],:);
 Jinv = pinv(J);
 
 plot(0,0,'ko','MarkerFaceColor','k','MarkerSize',8)
@@ -59,7 +65,7 @@ plot([0,a*cos(q(1)),a*cos(q(2)+q(1))+a*cos(q(1)),x_pos(1)],[0,a*sin(q(1)),a*sin(
 plot(Pe(1),Pe(2),'o')
 plot(x_pos(1),x_pos(2),'+')
 
-%% Ellissoide velocita
+%% Elissoide velocita
 [V,D] = eig(J*J');
 ev = eig(J*J');
 t1 = atan2(V(2,2),V(1,2));
