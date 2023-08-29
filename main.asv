@@ -1,10 +1,11 @@
-%% Path
+%%Path
 current_path = genpath(pwd);
 addpath(current_path);
-close all; clear; clc;
+close all; clear all; clc;
 
-%% Configurazione iniziale manipolatore
+%%Configurazione iniziale manipolatore
 a = 1;
+
 %% PUNTO INIZIALE
 theta1_deg = 90; 
 theta2_deg = 90;
@@ -13,6 +14,7 @@ theta1_rad = deg2rad(theta1_deg);
 theta2_rad = deg2rad(theta2_deg);
 theta3_rad = deg2rad(theta3_deg);
 q=[theta1_rad,theta2_rad,theta3_rad];
+
 %% PUNTO FINALE
 theta1_deg = 0; 
 theta2_deg = 0;
@@ -21,42 +23,46 @@ theta1_rad = deg2rad(theta1_deg);
 theta2_rad = deg2rad(theta2_deg);
 theta3_rad = deg2rad(theta3_deg);
 q2=[theta1_rad,theta2_rad,theta3_rad];
-%% CINEMATICA DIRETTA PUNTO DI PARTENZA
-[A10, A20,A30,A40] = CinematicaDiretta(a,q);
-x_pos1 = [A40(1,4),A40(2,4)];
-%% CINEMATICA DIFFERENZIALE
-[J] = JacobianoGeometrico(a,q,A10,A20,A30);
-Jinv = pinv(J);
-%% CINEMATICA DIRETTA PUNTO DI ARRIVO
-[A10, A20,A30,A40] = CinematicaDiretta(a,q2);
-x_pos2 = [A40(1,4),A40(2,4)];
-
-%% VARIABILI DI APPOGGIO
-errori=[];
-q_appoggio = q;
-x_pos = x_pos1;
 
 %% CONFIGURAZIONE TRAIETTORIA
 ti = 0;
 tf = 5;
 delta_t = 0.4;
-k = [1,0;
-     0, 1;];
+k = [100,0;
+   0, 100;];
+%% CINEMATICA DIRETTA 
+[A10, A20,A30,A40] = CinematicaDiretta(a,q);
+x_pos1 = [A40(1,4),A40(2,4)];
+
+[J] = JacobianoGeometrico(a,q,A10,A20,A30);
+Jinv = pinv(J);
+
+[A10, A20,A30,A40] = CinematicaDiretta(a,q2);
+x_pos2 = [A40(1,4),A40(2,4)];
+errori=[];
+
+q_appoggio = q;
+x_pos = x_pos1;
 for t = ti : delta_t : tf
-    %% CALCOLO DELLA TRAIETTORIA
+    %%CALCOLO DELLA TRAIETTORIA
     Pe = x_pos1 + ((-3*(x_pos1-x_pos2))/25)*t^2  + ((2*(x_pos1-x_pos2))/125)*t^3 ;
     Pe_der = ((6/125)*(t^2) - (6/25)*t) * (x_pos1-x_pos2);
+    Pe
+    x_pos
     errore = Pe - x_pos;
     errori = [errori;errore];
-    q_der = Jinv *( (Pe_der') + (k*errore'));
+    q_der = Jinv *( (Pe_der') + (errore'));
     q_appoggio = q_appoggio + (q_der * delta_t)';
+
+    q_appoggio
+    q2
     [A10, A20,A30,A40] = CinematicaDiretta(a,q_appoggio);
     x_pos = [A40(1,4),A40(2,4)];
     [J] = JacobianoGeometrico(a,q_appoggio,A10,A20,A30);
-    J = J(1:2,:);
+    J = J([1:2],:);
     Jinv = pinv(J);
     
-    %% GRAFICHIAMO
+    %%GRAFICHIAMO
     plot(0,0,'ko','MarkerFaceColor','k','MarkerSize',8)
     hold on
     plot([0,a*cos(q_appoggio(1)),a*cos(q_appoggio(2)+q_appoggio(1))+a*cos(q_appoggio(1)),x_pos(1)],[0,a*sin(q_appoggio(1)),a*sin(q_appoggio(2)+q_appoggio(1))+a*sin(q_appoggio(1)),x_pos(2)],'r-o','linewidth',1.5,'MarkerfaceColor','r','MarkerSize',5)
@@ -71,13 +77,13 @@ for t = ti : delta_t : tf
     ye = sqrt(min(abs(ev)));
     aa = [cos(t1), -sin(t1); sin(t1), cos(t1)]* [xe*cosd(0:360)/ xe; ye*sind(0:360)/xe];
     plot(x_pos(1)+aa(1,:), x_pos(2)+aa(2,:),'b-');
-    
-    hold off
-    grid on
-    axis square
-    pause(1)
-end
 
-errori
+
+hold off
+grid on
+axis square
+pause(1)
+
+end
 
 

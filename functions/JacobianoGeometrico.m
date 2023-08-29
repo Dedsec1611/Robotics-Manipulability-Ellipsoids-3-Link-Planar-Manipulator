@@ -14,6 +14,6 @@ J1 = [cross(z0,(p3-p0));z0];
 J2 = [cross(z1,(p3-p1));z1];
 J3 = [cross(z2,(p3-p2));z2];
 JTot=[J1,J2,J3];
-%%-----sola parte posizionale----%%%
-J = JTot([1:2],:);
+%%----- sola parte posizionale ----%%%
+J = JTot(1:2,:);
 end
