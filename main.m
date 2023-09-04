@@ -23,37 +23,44 @@ theta3_rad = deg2rad(theta3_deg);
 q2=[theta1_rad,theta2_rad,theta3_rad];
 %% CINEMATICA DIRETTA PUNTO DI PARTENZA
 [A10, A20,A30,A40] = CinematicaDiretta(a,q);
-x_pos1 = [A40(1,4),A40(2,4)];
+x_pos1 = [A40(1,4),A40(2,4)]
 %% CINEMATICA DIFFERENZIALE
 [J] = JacobianoGeometrico(a,q,A10,A20,A30);
 Jinv = pinv(J);
 %% CINEMATICA DIRETTA PUNTO DI ARRIVO
 [A10, A20,A30,A40] = CinematicaDiretta(a,q2);
-x_pos2 = [A40(1,4),A40(2,4)];
+x_pos2 = [A40(1,4),A40(2,4)]
 
 %% VARIABILI DI APPOGGIO
 errori=[];
 q_appoggio = q;
 x_pos = x_pos1;
-
+[J] = JacobianoGeometrico(a,q_appoggio,A10,A20,A30);
+Jinv = pinv(J);
 %% CONFIGURAZIONE TRAIETTORIA
 ti = 0;
 tf = 5;
 delta_t = 0.4;
-k = [1,0;
-     0, 1;];
+k = [4,0;
+     0, 4];
 for t = ti : delta_t : tf
     %% CALCOLO DELLA TRAIETTORIA
-    Pe = x_pos1 + ((-3*(x_pos1-x_pos2))/25)*t^2  + ((2*(x_pos1-x_pos2))/125)*t^3 ;
-    Pe_der = ((6/125)*(t^2) - (6/25)*t) * (x_pos1-x_pos2);
+    Px = -1 + (60/125)*t^2 - (8/125)*t^3;
+    Py = 2 +(4/125)*t^3 - (30/125)*t^2;
+    Pe =[Px,Py];
+
+    Pe_derx =  (-24/125)*t^2 + (120/125)*t;
+    Pe_dery =  (12/125)*(t^2) - (60/125)*t ;
+    Pe_der = [Pe_derx,Pe_dery];
+
     errore = Pe - x_pos;
     errori = [errori;errore];
-    q_der = Jinv *( (Pe_der') + (k*errore'));
+    q_der = Jinv * ((Pe_der') + (k*errore'));
     q_appoggio = q_appoggio + (q_der * delta_t)';
+
     [A10, A20,A30,A40] = CinematicaDiretta(a,q_appoggio);
     x_pos = [A40(1,4),A40(2,4)];
     [J] = JacobianoGeometrico(a,q_appoggio,A10,A20,A30);
-    J = J(1:2,:);
     Jinv = pinv(J);
     
     %% GRAFICHIAMO
@@ -72,6 +79,11 @@ for t = ti : delta_t : tf
     aa = [cos(t1), -sin(t1); sin(t1), cos(t1)]* [xe*cosd(0:360)/ xe; ye*sind(0:360)/xe];
     plot(x_pos(1)+aa(1,:), x_pos(2)+aa(2,:),'b-');
     
+
+    %%MANIPOLABILITA
+  
+
+
     hold off
     grid on
     axis square
