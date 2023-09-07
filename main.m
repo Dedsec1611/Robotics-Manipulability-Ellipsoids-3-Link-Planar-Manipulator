@@ -5,6 +5,9 @@ close all; clear; clc;
 
 %% Configurazione iniziale manipolatore
 a = 1;
+ti = 0;
+tf = 5;
+delta_t = 0.4;
 %% PUNTO INIZIALE
 theta1_deg = 90; 
 theta2_deg = 90;
@@ -23,36 +26,27 @@ theta3_rad = deg2rad(theta3_deg);
 q2=[theta1_rad,theta2_rad,theta3_rad];
 %% CINEMATICA DIRETTA PUNTO DI PARTENZA
 [A10, A20,A30,A40] = CinematicaDiretta(a,q);
-x_pos1 = [A40(1,4),A40(2,4)]
+x_pos1 = [A40(1,4),A40(2,4)];
 
 %% CINEMATICA DIRETTA PUNTO DI ARRIVO
 [A10, A20,A30,A40] = CinematicaDiretta(a,q2);
-x_pos2 = [A40(1,4),A40(2,4)]
+x_pos2 = [A40(1,4),A40(2,4)];
 
 %% VARIABILI DI APPOGGIO
-errori=[];
-q_appoggio = q;
-x_pos = x_pos1;
-[J] = JacobianoGeometrico(a,q_appoggio,A10,A20,A30);
-Jinv = pinv(J);
-%% CONFIGURAZIONE TRAIETTORIA
-ti = 0;
-tf = 5;
-delta_t = 0.5;
-K = [4,0;
-     0, 4];
-uno =  pinv([tf^3,tf^2;3*tf^2,2*tf])
-due = [q2-q;0,0,0]
-a32 = uno*due
-a3 = a32(1,:)
-a2 = a32(2,:)
-a0 = q
-a1 = 0
-
 q_grafico = [];
-q_der_grafico =[]
+q_der_grafico =[];
 pos_e = [];
 manip =  [];
+x_pos = x_pos1;
+
+%% CONFIGURAZIONE TRAIETTORIA
+mat_uno =  pinv([tf^3,tf^2;3*tf^2,2*tf]);
+mat_due = [q2-q;0,0,0];
+a32 = mat_uno*mat_due;
+a3 = a32(1,:);
+a2 = a32(2,:);
+a0 = q;
+a1 = 0;
 
 for t = ti : delta_t : tf
      %% CALCOLO DELLA TRAIETTORIA
@@ -65,16 +59,15 @@ for t = ti : delta_t : tf
     pos_e=[pos_e;x_pos];
     [J] = JacobianoGeometrico(a,q_tra,A10,A20,A30);
     Jinv = pinv(J);
-    
+    rank(J)
     %% GRAFICHIAMO
-
     plot(0,0,'ko','MarkerFaceColor','k','MarkerSize',8)
     hold on
     plot([0,a*cos(q_tra(1)),a*cos(q_tra(2)+q_tra(1))+a*cos(q_tra(1)),x_pos(1)],[0,a*sin(q_tra(1)),a*sin(q_tra(2)+q_tra(1))+a*sin(q_tra(1)),x_pos(2)],'r-o','linewidth',1.5,'MarkerfaceColor','r','MarkerSize',5)
     %%plot(Pe(1),Pe(2),'o')
     plot(x_pos(1),x_pos(2),'+')
 
-    %% Elissoide velocita'
+    %% Ellissoide velocita'
     %%Calcolo autovalori
     %%Dir assi
     %%----- sola parte posizionale ----%%%
@@ -90,8 +83,9 @@ for t = ti : delta_t : tf
 
 
     %% MANIPOLABILITA'
-    sigma = sqrt(det(J*J'));
-    manip = [manip;sigma]
+    J_map =[J_pos;1,1,1];
+    sigma = sqrt(det(J_map*J_map'));
+    manip = [manip;sigma];
 
     hold off
     grid on
@@ -100,7 +94,6 @@ for t = ti : delta_t : tf
 end
 
 t=ti:delta_t:tf;
-
 figure
 hold on; 
 plot( t, q_grafico(:,1), 'r', 'LineWidth', 4);
@@ -110,8 +103,8 @@ title('Position of joints: q1,q2,q3')
 legend('q1', 'q2','q3');
 xlabel('[s]')
 ylabel('[rad]')
- grid on
-    axis square
+grid on
+axis square
 hold on;
 
 figure
@@ -123,8 +116,8 @@ title('Velocity of joints: q1,q2,q3')
 legend('q1', 'q2','q3');
 xlabel('[s]')
 ylabel('[rad/s]')
- grid on
-    axis square
+grid on
+axis square
 hold on;
 
 f = figure;
