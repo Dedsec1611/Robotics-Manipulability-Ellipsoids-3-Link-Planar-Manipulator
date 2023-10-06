@@ -1,4 +1,4 @@
-function [J] = JacobianoGeometrico(a,q,A10,A20,A30)
+function [J] = JacobianoGeometrico(a,q)
 p0 = [0;0;0];
 p1 = [a*cos(q(1)); a*sin(q(1));0];
 p2= [(a*cos(q(1))+ a*cos(q(1)+q(2)));

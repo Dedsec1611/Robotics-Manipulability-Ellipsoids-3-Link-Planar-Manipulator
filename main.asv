@@ -3,13 +3,13 @@ current_path = genpath(pwd);
 addpath(current_path);
 close all; clear; clc;
 
-%% Starting configuration manipulator
+%% Configurazione iniziale manipolatore
 a = 1;
 ti = 0;
 tf = 5;
 delta_t = 0.4;
 
-%% Start point
+%% PUNTO INIZIALE
 theta1_deg = 90; 
 theta2_deg = 90;
 theta3_deg = -90; 
@@ -18,7 +18,7 @@ theta2_rad = deg2rad(theta2_deg);
 theta3_rad = deg2rad(theta3_deg);
 q=[theta1_rad,theta2_rad,theta3_rad];
 
-%% Final point
+%% PUNTO FINALE
 theta1_deg = 0; 
 theta2_deg = 0;
 theta3_deg = 0;
@@ -27,15 +27,15 @@ theta2_rad = deg2rad(theta2_deg);
 theta3_rad = deg2rad(theta3_deg);
 q2=[theta1_rad,theta2_rad,theta3_rad];
 
-%% Direct  Kinematic - Starting point 
+%% CINEMATICA DIRETTA PUNTO DI PARTENZA
 [A10, A20,A30,A40] = CinematicaDiretta(a,q);
 x_pos1 = [A40(1,4),A40(2,4)];
 
-%% Direct  Kinematic - Arrival point 
+%% CINEMATICA DIRETTA PUNTO DI ARRIVO
 [A10, A20,A30,A40] = CinematicaDiretta(a,q2);
 x_pos2 = [A40(1,4),A40(2,4)];
 
-%% Temp variables
+%% Temp v
 q_grafico = [];
 q_der_grafico =[];
 pos_e = [];
