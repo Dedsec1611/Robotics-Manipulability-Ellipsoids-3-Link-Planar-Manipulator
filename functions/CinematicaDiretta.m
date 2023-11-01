@@ -1,5 +1,5 @@
 function [A10, A20,A30,A40] = CinematicaDiretta(a,q)
-%%---------- a => lunghezza dei bracci --------------- %%
+%%---------- a => arms length --------------- %%
 A10 = [cos(q(1)), -sin(q(1)), 0, a*cos(q(1));
        sin(q(1)), cos(q(1)), 0 , a*sin(q(1));
        0,0,1,0;
