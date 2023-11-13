@@ -57,9 +57,9 @@ mat_due = [q2-q - (q_der2_final/2)* tf^2 - q_der_init*tf;
            q_der_final - q_der2_init*tf - q_der_init;
            q_der2_final - q_der2_init;];
 a543 = mat_uno*mat_due;
-a5 = a543(1,:);
-a4 = a543(2,:);
-a3 = a543(3,:);
+a5 = a543(1,:)
+a4 = a543(2,:)
+a3 = a543(3,:)
 a0 = q;
 a1 = 0;
 a2=0;
@@ -102,9 +102,8 @@ for t = ti : delta_t : tf
 
 
     %% Manipulability
-    J_map =[J_pos;1,1,1];
-    sigma = sqrt(det(J_map*J_map'));
-    manip = [manip;sigma];
+    sigma = sqrt(det(J_pos*J_pos'));
+    manip = [manip;sigma]
 
     hold off
     grid on
